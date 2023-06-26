@@ -2,21 +2,29 @@
   padding: 5px;
  
 }
-
 body{
-  background-image: url(./components/dark-blur-blurred-gradient.jpg);
+  background-image: url(./blured.jpg);
 }
-
+.heading{
+  color: #977e7e;
+  font-weight: bolder ;
+}
 .App{
   text-align: center;
 }
+.title{
+  font-weight: bolder ;
+  font-size: large;
+}
+button{
+  margin: 5px;
 
+}
 .card{
   padding-top: 10px;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-  justify-content: center;
-  align-items: center;
-  display: flex;
+  width: 65%;
+  margin-left: 17%;
 }
 
 .add{
@@ -27,6 +35,16 @@ body{
 
 input{
   box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
-  max-width: 50%;
- 
+  
+}
+
+.form-control{
+  margin-left: 25%;
+  width: 50%;
+}
+
+.item{
+  border: 1px solid black;
+  border-radius: 10px;
+  margin: 2px;
 }

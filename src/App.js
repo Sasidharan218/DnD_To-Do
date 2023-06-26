@@ -1,68 +1,121 @@
-import { useState } from 'react'
-
-import TodoList from './components/TodoList'
-
-const App = () => {
-  const [todos, setTodos] = useState([])
-  const [state, setState] = useState(0) 
-  const [task, setTask] = useState('')
- 
+import React, {useState} from 'react';
+import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd";
+import _ from "lodash";
+import {v4} from "uuid";
 
 
-  const remove = id => {
+function App() {
+  const [text, setText] = useState("")
+  const [state, setState] = useState({
+    "todo": {
+      title: "TodoList",
+      items: []
+    },
+    "in-progress": {
+      title: "Completed",
+      items: []
+    },
    
-    const newTodos = [...todos]
+  })
 
-    if (task !== -1) {
-      newTodos.splice(task, 1)
+  const handleDragEnd = ({destination, source}) => {
+    if (!destination) {
+      return
     }
 
-    setTodos(newTodos)
-  }
+    if (destination.index === source.index && destination.droppableId === source.droppableId) {
+      return
+    }
 
-  const add = (e) => {
-    e.preventDefault()
-      if (task.trim() !== '') {
-        const newTodo = {
-          _id: Date.now(),
-          task: task.trim(),
-          completed: false,
-        }
-        setTodos([...todos, newTodo])
-        setState(1)
-      }
-      setTask('')
     
+    const itemCopy = {...state[source.droppableId].items[source.index]}
+
+    setState(prev => {
+      prev = {...prev}
+      prev[source.droppableId].items.splice(source.index, 1)
+      prev[destination.droppableId].items.splice(destination.index, 0, itemCopy)
+
+      return prev
+    })
   }
 
-  const handleOnDragEnd = result => {
-    if (!result.destination) return
+   const addItem = () => {
+    setState(prev => {
+      return {
+        ...prev,
+        todo: {
+          title: "TodoList",
+          items: [
+            {
+              id: v4(),
+              name: text
+            },
+            ...prev.todo.items
+          ]
+        }
+      }
+    })
 
-    const items = [...todos]
-    const [reorderedItem] = items.splice(result.source.index, 1)
-    items.splice(result.destination.index, 0, reorderedItem)
-    setTodos(items)
+    setText("")
   }
-
+ 
 
   return (
-    <div className='container App'>
- 
-        <div>
+    <div className="container App">
+       <div className='heading'>
           <h1>TODO</h1>
         </div>
-        <div className='add'>
-          <input className='form-control' type='text' value={task} onChange={e => setTask(e.target.value)} placeholder="Type Here..."/><br/>
-          <button onClick={add} className='btn btn-primary'>ADD</button><br/>
-          <button className='btn btn-danger' onClick={remove}>Delete</button>
-        </div><br/>
-        <div className='card'>
-          <h4>TodoList</h4>
-          <TodoList state={state} todos={todos} remove={remove} handleOnDragEnd={handleOnDragEnd}
-          />
-          </div>
+      <div>
+        <input className='form-control' type="text" value={text} onChange={(e) => setText(e.target.value)} placeholder="Type Here..."/><br/>
+        <button onClick={addItem} className='btn btn-primary'>Add</button>
+        
+      </div>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        {_.map(state, (data, key) => {
+          return(
+           <div>
+             <div key={key} className="card">
+             <div className='title'>
+             {data.title}
+             </div>
+              <Droppable droppableId={key}>
+                {(provided,  snapshot) => {
+                  return(
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      
+                    >
+                      {data.items.map((el, index) => {
+                        return(
+                          <Draggable key={el.id} index={index} draggableId={el.id}>
+                            {(provided, snapshot) => {
+                              return(
+                                <div
+                                className={`item ${snapshot.isDragging && "dragging"}`}
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  {el.name}
+                                </div>
+                              )
+                            }}
+                          </Draggable>
+                        )
+                      })}
+                      {provided.placeholder}
+                    </div>
+                  )
+                }}
+              </Droppable>
+            </div>
+           </div>
+          )
+        })}
+      </DragDropContext>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
